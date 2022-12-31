@@ -1,0 +1,15 @@
+public class SuperFlower extends Powerup
+{
+  private String type;
+  
+  public SuperFlower(double left, double top, String image, String type)
+  {
+    super(left, top, 25, 25, image, "SuperFlower");
+    this.type = type;
+  }
+  
+  public String flowerType()
+  {
+    return type;
+  }
+}

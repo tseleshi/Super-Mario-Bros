@@ -1,0 +1,220 @@
+public class Hero extends Character
+{
+  private int lives;
+  public int coinCount;
+  private int heroLevel;
+  private String hero;
+  
+  private long lastLostLife;
+  
+  private double vx;
+  private double vy;
+  
+  private boolean grounded;
+  
+  public Hero(double left, double top, int width, int height, String image, double vx, double vy, String hero)
+  {
+    super(left, top, width, height, image, "Hero");
+    lives = 5;
+    coinCount = 0;
+    heroLevel = 1;
+    this.vx = vx;
+    this.vy = vy;
+    grounded = true;
+    this.hero = hero;
+  }
+  
+  public int numCoins()
+  {
+    return coinCount;
+  }
+  
+  public String name()
+  {
+    return hero;
+  }
+    
+  public int getLives()
+  {
+    return lives;
+  }
+  
+  public void setLives(int change)  //adds int change to lives  
+  {
+    lives += change;
+  }
+  
+   public void kill()
+  {
+    if(heroLevel == 1)
+    {
+      if(System.currentTimeMillis() - lastLostLife > 5000)
+      {
+        //System.out.println("losing life");
+        lives--;
+        lastLostLife = System.currentTimeMillis();
+        super.kill();
+      }
+    }
+    else
+     setHeroLevel(heroLevel - 1);
+  }
+  
+  public int heroLevel()
+  {
+    return heroLevel;
+  }
+  
+  public void setHeroLevel(int level)
+  {
+    if(level == 1)
+    {
+      heroLevel = 1;
+      setImage("mini " + hero + ".png");
+    }
+    else if(level == 2)
+    {
+      heroLevel = 2;
+      setImage(hero + ".png");
+    }
+    else //level == 3
+    {
+      heroLevel = 3;
+      setImage("fire " + hero + ".png");
+    }
+  }
+  
+  public double getVY()
+  {
+    return vy;
+  }
+  
+  public void setVY(double velocityY)
+  {
+    vy = velocityY;
+  }
+  
+  public boolean grounded()
+  {
+    return grounded;
+  }
+  
+  public void land(boolean l)
+  {
+    grounded = l;
+  }
+  
+  public void collide(Character b, World world) 
+  {
+    double aBottom = getHeight() + getTop();
+    double bBottom = b.getHeight() + b.getTop();
+    double aRight = getLeft() + getWidth();
+    double bRight = b.getLeft() + b.getWidth();
+    
+    //bad guy collision
+    if(b.characterType().equals("BadGuy")) 
+    {
+      if(aBottom < bBottom && vy > 0) 
+        b.kill();
+      else
+      {
+        if(getLives() > 0)
+          kill();
+      }
+    }
+    
+    //platform collision
+    else if(b.characterType().equals("Platform"))  
+    {
+      if(aBottom < bBottom && vy > 0)  //collides with top
+      {
+        land(true);
+        setTop(b.getTop() - getHeight());
+        vy = 0;
+      }
+      else if(vy < 0 && getTop() < bBottom && getTop() > b.getTop()) //collides with bottom
+      {
+        //empty contents of platform, then gravity takes hold
+        b.setTop(b.getTop() + 1);
+        ((Platform)b).empty(world);
+        land(false);
+        setTop(bBottom);
+        vy = 1;
+        b.setTop(b.getTop() - 1);
+        //if theres a badGuy on top, the bad guy dies
+      }
+      else if(aBottom > b.getTop()) //collides with side
+      {
+        //slides down the bottom
+        if(aRight > b.getLeft() && getLeft() < b.getLeft()) //colliding from the left
+        {
+          setLeft((b.getLeft() - 0.1) - getWidth());
+          vy = 0;
+        }
+        else if(getLeft() < bRight) //colliding from the right
+        {
+          vy = 0;
+          setLeft((bRight + 0.1));
+        }
+      }
+    } 
+    
+    //powerup collision
+    else if(b.characterType().equals("SuperFlower") || b.characterType().equals("SuperShroom"))
+    {
+      if(b.characterType().equals("SuperFlower"))
+      {
+        setHeroLevel(3);
+        if(((SuperFlower)b).flowerType().equals("ice"))
+        {
+          setImage("ice " + hero + ".png");
+        }
+      }
+      else if(b.characterType().equals("SuperShroom"))
+      {
+        if(heroLevel < 2 && ((SuperShroom)b).getColor().equals("red"))
+          setHeroLevel(2);
+        else if(((SuperShroom)b).getColor().equals("green"))//color is green
+          lives ++;
+      }
+      b.kill();
+    }
+    
+    // floating coin collision
+    else if(b instanceof Coin)
+    {
+      coinCount++;
+      b.kill();
+    }
+    
+  }
+  
+  public void step(World world)
+  {
+    if(coinCount > 100)
+    {
+      lives++;
+      coinCount -= 100;
+    }
+    
+    //gravity
+    setVY( getVY() + 0.1 );
+    if(grounded)
+    {
+      vy = 0;
+      setTop(getTop() + vy);
+      land(true);
+    }
+    
+    if(getTop() + getHeight() > world.getHeight() && vy >= 0)
+    {
+      while(lives > 0)
+      {
+        kill();
+      }
+    }
+    
+    setLeft( getLeft() + vx );
+    setTop( getTop() + vy );
+  }
+}

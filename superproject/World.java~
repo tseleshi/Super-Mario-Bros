@@ -1,0 +1,295 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
+
+public class World
+{
+  public static void main(String[] args)
+  {
+    Display display = new Display(500, 500);  //sets dimensions of world
+    display.run();
+  }
+  
+  public ArrayList<Character> characters;
+  public Hero hero;
+  private int width;
+  private int height;
+  private Color background; //in case we want different types of levels later
+  private int level;
+  
+  public World(int w, int h, String heroName, int l)
+  {
+    width = w;
+    height = h;
+    level = l;
+    
+    characters = new ArrayList<Character>();
+    
+    //hero
+    hero = new Hero(0, (double)height - 120, 50, 50, "mini " + heroName + ".png", 0.0, 0.0, heroName);
+    characters.add(hero);
+    
+    if(level == 1)  //hannah
+    {
+    background = new Color(221, 251, 255);
+    
+    //bad guys
+    characters.add(new GraviBad(525, (double)height - 61, 50, 50, "goomba.png", -0.2, 0));
+    characters.add(new GraviBad(1600, 159, 50, 50, "koopa troopa.png", 0, 0));
+    characters.add(new GraviBad(1550, 399, 50, 50, "koopa troopa.png", 0, 0));
+    characters.add(new GraviBad(1600, (double)height - 61, 50, 50, "goomba.png", -0.2, 0));
+    
+    //platforms 
+    characters.add(new Platform(-250, 490, 1000, 10, "grass.png", null)); //ground
+    characters.add(new Platform(815, 480, 200, 20, "grass.png", null)); 
+    characters.add(new Platform(1090, 450, 250, 50, "grass.png", null));
+    characters.add(new Platform(1430, 490, 400, 10, "grass.png", null));
+    characters.add(new Platform(1905, 480, 200, 20, "grass.png", null)); //1905-2105
+    characters.add(new Platform(2180, 490, 20000, 10, "grass.png", null));
+    
+    characters.add(new Platform(350, 350, 50, 25, "???.jpeg", "Coin")); //blocks
+    characters.add(new Platform(500, 350, 50, 25, "???.jpeg", "big shroom"));
+    characters.add(new Platform(550, 350, 50, 25, "???.jpeg", "Coin"));
+    characters.add(new Platform(1200, 310, 50, 25, "brick.jpeg", "ice flower"));
+    characters.add(new Platform(1550, 350, 50, 25, "brick.jpeg", "Coin")); 
+    characters.add(new Platform(1600, 350, 50, 25, "brick.jpeg", "Coin"));
+    characters.add(new Platform(1650, 350, 50, 25, "brick.jpeg", "Coin"));
+    characters.add(new Platform(1600, 210, 50, 25, "brick.jpeg", "fire flower"));
+    
+    //coins
+    characters.add(new Coin(780, 400));
+    characters.add(new Coin(820, 350));
+    characters.add(new Coin(855, 350));
+    
+    characters.add(new Coin(1015, 350));
+    characters.add(new Coin(1055, 300));
+    characters.add(new Coin(1100, 300));
+    
+    characters.add(new Coin(1875, 330));
+    characters.add(new Coin(1945, 300));
+    characters.add(new Coin(2000, 300));
+    characters.add(new Coin(2075, 330));
+    }
+    else if(level == 2)  //panya (underground level)
+    {
+      background = new Color(0,0,0);
+      hero.setTop((double)height - 120);
+      
+      //platforms
+      // character: left, top, width, height, image, character type
+      // platform: left, top, width, height, image, powerup
+      // coin: left, top
+      // gravibad: left, top, width, height, image, character type, vx, vy
+      
+      // bad guys 
+      characters.add(new GraviBad(525, 435, 50, 50, "goomba.png", -0.2, 0));
+      
+      //wall
+      characters.add(new Platform(-225, 0, 50, 500, "wall.png", null));
+      
+      //ground
+      characters.add(new Platform(-975, 450, 750, 50, "underground row.png", null));
+      characters.add(new Platform(-225, 450, 750, 50, "underground row.png", null));
+      characters.add(new Platform(525, 450, 750, 50, "underground row.png", null));
+      characters.add(new Platform(1275, 450, 750, 50, "underground row.png", null));
+      characters.add(new Platform(2025, 450, 750, 50, "underground row.png", null));
+      
+      //platforms
+      characters.add(new Platform(200, 315, 50, 45, "???.jpeg", "fire flower"));
+      //fix: mario glitches when jumping onto the first one 
+      characters.add(new Platform(400, 315, 50, 45, "???.jpeg", "Coin"));
+      characters.add(new Platform(475, 315, 50, 45, "???.jpeg", "Coin"));
+      characters.add(new Platform(550, 315, 50, 45, "???.jpeg", "Coin"));
+      // pyramid
+      //fix: mario goes through these
+      characters.add(new Platform(700, 400, 40, 40, "underground block.png", null));
+      characters.add(new Platform(775, 400, 40, 40, "underground block.png", null));
+      characters.add(new Platform(775, 360, 40, 40, "underground block.png", null));
+      characters.add(new Platform(850, 400, 40, 40, "underground block.png", null));
+      characters.add(new Platform(850, 360, 40, 40, "underground block.png", null));
+      characters.add(new Platform(850, 320, 40, 40, "underground block.png", null));
+      characters.add(new Platform(925, 400, 40, 40, "underground block.png", null));
+      characters.add(new Platform(925, 360, 40, 40, "underground block.png", null));
+      characters.add(new Platform(925, 320, 40, 40, "underground block.png", null));
+      characters.add(new Platform(925, 280, 40, 40, "underground block.png", null));
+      characters.add(new Platform(1050, 315, 45, 45, "blue brick.png", "Coin"));
+      // L
+      characters.add(new Platform(1205, 315, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1250, 315, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1295, 315, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1295, 270, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1340, 270, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1385, 270, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1430, 270, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1475, 270, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1475, 315, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1475, 360, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1520, 360, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1565, 360, 45, 45, "blue brick.png", null));
+      characters.add(new Platform(1665, 270, 45, 45, "blue brick.png", "ice flower"));
+      
+      //Coins
+      characters.add(new Coin(1255, 280));
+      characters.add(new Coin(1300, 235));
+      characters.add(new Coin(1345, 235));
+      characters.add(new Coin(1390, 235));
+      characters.add(new Coin(1435, 235));
+      characters.add(new Coin(1480, 235));
+      characters.add(new Coin(1345, 235));
+      characters.add(new Coin(1525, 325));
+      characters.add(new Coin(1570, 325));
+    } 
+   
+    else if(level == 3)  //tsega 
+    {
+      background = new Color(221,251,255);
+      
+      //platforms
+      characters.add(new Platform(-600, 490, 20000, 10, "grass.png", null)); //ground
+    }
+  }
+  
+  public void stepAll()
+  {
+    for (int i = 0; i < characters.size(); i++)
+    {
+      Character c = characters.get(i);
+      
+      //removes dead characters
+      if(!c.getVitals()) 
+      {
+        if(c.characterType().equals("Hero"))
+        {
+          if(((Hero)c).getLives() == 0)
+           {
+             //end game
+           }
+           else
+           {
+             //end level
+           }
+        }
+        else 
+         characters.remove(i);
+      }
+      
+      //deals with collisions
+      Character collided = null;
+      for(int j = 0; j < characters.size(); j++)
+      {
+        if(j != i)
+        {
+          Character b = characters.get(j);
+          if(c.overlap(b))
+          {
+            c.collide(b, this);
+            collided = b;
+          }
+        }
+      }
+      if (collided == null && (c instanceof Hero || c instanceof GraviBad || c instanceof SuperShroom))
+      {
+        if(c.characterType().equals("Hero"))
+          ((Hero)c).land(false);
+        else if(c instanceof GraviBad)
+          ((GraviBad)c).land(false);
+        else 
+          ((SuperShroom)c).land(false);
+      }
+      
+      c.step(this);
+    }
+  }
+  
+  public int getWidth()
+  {
+    return width;
+  }
+  
+  public int getHeight()
+  {
+    return height;
+  }
+  
+  public int getNumCharacters()
+  {
+    return characters.size();
+  }
+  
+  public Character getCharacter(int index)
+  {
+    return characters.get(index);
+  }
+
+  public void mouseClicked(int x, int y)
+  {
+    System.out.println("mouseClicked:  " + x + ", " + y);
+  }
+  
+  public void keyPressed(int key) 
+  {
+    if(key == 37)
+    {
+      hero.setLeft(hero.getLeft() - 15);
+    }
+    else if(key == 39)
+    {
+      hero.setLeft(hero.getLeft() + 15);
+    }
+    else if(key == 38)
+    {
+      if(hero.grounded())
+      {
+      hero.setVY(-5.5);
+      hero.land(false);
+      }
+    }
+    else if(key == 32 && hero.heroLevel() == 3)
+    {
+      if(hero.getImage().equals("fire " + hero.name() + ".png"))
+        characters.add(new FlowerBall( hero.getLeft() + hero.getWidth(), hero.getTop() + 3 ,"fireball.png","fireball"));
+      else
+        characters.add(new FlowerBall( hero.getLeft() + hero.getWidth(), hero.getTop() + 3 ,"iceball.png","iceball"));
+    }
+  }
+  
+  public void keyReleased(int key)
+  {
+  }
+  
+  public String getTitle()
+  {
+    return "Super Mario Bros";
+  }
+  
+  public void paintComponent(Graphics g) //changes scrolling
+  {
+    g.setColor(background);     //changes background color
+    g.fillRect(0, 0, width, height);
+    
+//    g.drawImage(Display.getImage("background.gif"),
+//                (int)(225 - hero.getLeft()),
+//                0,
+//                /*character.getWidth(), character.getHeight(),*/ null);
+   
+    g.drawString("lives: " + hero.getLives(), 25, 25);
+    for (int i = 0; i < characters.size(); i++)
+    {
+      Character character = characters.get(i);
+      g.drawImage(Display.getImage(character.getImage()),
+                  (int)(225 + character.getLeft() - hero.getLeft()),
+                  (int)character.getTop(),
+                  character.getWidth(), character.getHeight(), null);
+    }
+   if(level == 1 || level == 3)
+    g.setColor(Color.BLACK);
+   else
+    g.setColor(Color.YELLOW);
+   
+    g.setFont(new Font(null, Font.BOLD, 18));
+    g.drawString("lives: " + hero.getLives(), 25, 25);
+    g.drawString("coins: " + hero.numCoins(), 25, 50);
+    
+  }
+}

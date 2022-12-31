@@ -1,0 +1,32 @@
+public class MobileBad extends BadGuy
+{
+  private double vx;
+  private double vy;
+  
+  public MobileBad(double left, double top, int width, int height, String image,
+                      double velocityX, double velocityY)
+  {
+    super(left, top, width, height, image);
+    vx = velocityX; 
+    vy = velocityY;
+  }
+  
+  public double getVY()
+  {
+    return vy;
+  }
+  
+  public void setVY(double velocityY)
+  {
+    vy = velocityY;
+  }
+  
+  public void step(World world)
+  {
+    vx = -0.25;
+    
+    setLeft( getLeft() + vx );
+    setTop( getTop() + vy );
+  }
+  
+}

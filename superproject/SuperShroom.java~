@@ -1,0 +1,50 @@
+public class SuperShroom extends Powerup
+{
+  private String color;
+  private double vx;
+  private double vy;
+  private boolean grounded;
+  
+  public SuperShroom(double left, double top, String image, String color)
+  {
+    super(left, top, 25, 25, image, "SuperShroom");
+    this.vx = 0.25;
+    this.vy = 0;
+    grounded = true;
+    this.color = color;
+  }
+  
+  public void land(boolean l)
+  {
+    grounded = l;
+  }
+  
+  public double getVY()
+  {
+    return vy;
+  }
+  
+  public String getColor()
+  {
+    return color;
+  }
+  
+  public void setVY(double velocityY)
+  {
+    vy = velocityY;
+  }
+  
+  public void step (World world)
+  {
+    setVY( getVY() + 0.1 );
+    
+    if((getTop() + getHeight() > world.getHeight() && vy >= 0) || grounded)
+    {
+      vy = 0;
+      setTop(getTop() + vy);
+    }
+    
+    setLeft( getLeft() + vx );
+    setTop( getTop() + vy );
+  }
+}
